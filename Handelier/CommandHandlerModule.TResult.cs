@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Handelier
 {
-
     public abstract class CommandHandlerModule<TResult> : IEnumerable<CommandHandler<TResult>>
     {
         private readonly List<CommandHandler<TResult>> _handlers;
