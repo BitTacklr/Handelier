@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Handelier
 {
-    public class CommandHandlerEnumerator<TResult> : IEnumerator<CommandHandler<TResult>>
+    public class ResultCommandHandlerEnumerator<TResult> : IEnumerator<ResultCommandHandler<TResult>>
     {
-        private readonly CommandHandler<TResult>[] _handlers;
+        private readonly ResultCommandHandler<TResult>[] _handlers;
         private int _index;
 
-        public CommandHandlerEnumerator(CommandHandler<TResult>[] handlers)
+        public ResultCommandHandlerEnumerator(ResultCommandHandler<TResult>[] handlers)
         {
             _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
             _index = -1;
@@ -26,7 +26,7 @@ namespace Handelier
             _index = -1;
         }
 
-        public CommandHandler<TResult> Current
+        public ResultCommandHandler<TResult> Current
         {
             get
             {

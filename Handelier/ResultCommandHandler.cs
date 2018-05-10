@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace Handelier
 {
-    public class CommandHandler<TResult>
+    public class ResultCommandHandler<TResult>
     {
-        public CommandHandler(Type command, Func<object, CancellationToken, Task<TResult>> handler)
+        public ResultCommandHandler(Type command, Func<object, CancellationToken, Task<TResult>> handler)
         {
             Command = command ?? throw new ArgumentNullException(nameof(command));
             Handler = handler ?? throw new ArgumentNullException(nameof(handler));
