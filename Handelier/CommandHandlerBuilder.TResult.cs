@@ -33,6 +33,16 @@ namespace Handelier
             return new TransformedBeforeReturn<TNext>(_build, next => pipe(next));
         }
 
+        public ICommandHandlerBuilder<TNext> TransformReturn<TNext>(Func<Func<TNext, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> pipe)
+        {
+            if (pipe == null)
+            {
+                throw new ArgumentNullException(nameof(pipe));
+            }
+
+            return new TransformedAtReturn<TNext>(_build, next => pipe(next));
+        }
+
         public ICommandHandlerBuilder<TCommand> Return(Func<Func<TCommand, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> pipe)
         {
             if (pipe == null)
@@ -56,12 +66,12 @@ namespace Handelier
         private class BeforeReturn : ICommandHandlerBuilder<TCommand, TResult>
         {
             private readonly Action<Func<TCommand, CancellationToken, Task<TResult>>> _build;
-            private readonly Func<Func<TCommand, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> _return_pipeline;
+            private readonly Func<Func<TCommand, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> _pipeline;
 
-            public BeforeReturn(Action<Func<TCommand, CancellationToken, Task<TResult>>> build, Func<Func<TCommand, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> return_pipeline)
+            public BeforeReturn(Action<Func<TCommand, CancellationToken, Task<TResult>>> build, Func<Func<TCommand, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> pipeline)
             {
                 _build = build;
-                _return_pipeline = return_pipeline;
+                _pipeline = pipeline;
             }
 
             public ICommandHandlerBuilder<TCommand, TResult> Pipe(Func<Func<TCommand, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> pipe)
@@ -71,7 +81,7 @@ namespace Handelier
                     throw new ArgumentNullException(nameof(pipe));
                 }
 
-                return new BeforeReturn(_build, next => _return_pipeline(pipe(next)));
+                return new BeforeReturn(_build, next => _pipeline(pipe(next)));
             }
 
             public ICommandHandlerBuilder<TNext, TResult> Transform<TNext>(Func<Func<TNext, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> pipe)
@@ -81,7 +91,17 @@ namespace Handelier
                     throw new ArgumentNullException(nameof(pipe));
                 }
 
-                return new TransformedBeforeReturn<TNext>(_build, next => _return_pipeline(pipe(next)));
+                return new TransformedBeforeReturn<TNext>(_build, next => _pipeline(pipe(next)));
+            }
+
+            public ICommandHandlerBuilder<TNext> TransformReturn<TNext>(Func<Func<TNext, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> pipe)
+            {
+                if (pipe == null)
+                {
+                    throw new ArgumentNullException(nameof(pipe));
+                }
+
+                return new TransformedAtReturn<TNext>(_build, next => _pipeline(pipe(next)));
             }
 
             public ICommandHandlerBuilder<TCommand> Return(Func<Func<TCommand, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> pipe)
@@ -91,7 +111,7 @@ namespace Handelier
                     throw new ArgumentNullException(nameof(pipe));
                 }
 
-                return new AtReturn(_build, next => _return_pipeline(pipe(next)));
+                return new AtReturn(_build, next => _pipeline(pipe(next)));
             }
 
             public void Handle(Func<TCommand, CancellationToken, Task<TResult>> handler)
@@ -101,19 +121,19 @@ namespace Handelier
                     throw new ArgumentNullException(nameof(handler));
                 }
 
-                _build(_return_pipeline(handler));
+                _build(_pipeline(handler));
             }
         }
 
         private class TransformedBeforeReturn<TCurrent> : ICommandHandlerBuilder<TCurrent, TResult>
         {
             private readonly Action<Func<TCommand, CancellationToken, Task<TResult>>> _build;
-            private readonly Func<Func<TCurrent, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> _return_pipeline;
+            private readonly Func<Func<TCurrent, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> _pipeline;
 
-            public TransformedBeforeReturn(Action<Func<TCommand, CancellationToken, Task<TResult>>> build, Func<Func<TCurrent, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> return_pipeline)
+            public TransformedBeforeReturn(Action<Func<TCommand, CancellationToken, Task<TResult>>> build, Func<Func<TCurrent, CancellationToken, Task<TResult>>, Func<TCommand, CancellationToken, Task<TResult>>> pipeline)
             {
                 _build = build;
-                _return_pipeline = return_pipeline;
+                _pipeline = pipeline;
             }
 
             public ICommandHandlerBuilder<TCurrent, TResult> Pipe(Func<Func<TCurrent, CancellationToken, Task<TResult>>, Func<TCurrent, CancellationToken, Task<TResult>>> pipe)
@@ -123,7 +143,7 @@ namespace Handelier
                     throw new ArgumentNullException(nameof(pipe));
                 }
 
-                return new TransformedBeforeReturn<TCurrent>(_build, next => _return_pipeline(pipe(next)));
+                return new TransformedBeforeReturn<TCurrent>(_build, next => _pipeline(pipe(next)));
             }
 
 
@@ -134,7 +154,17 @@ namespace Handelier
                     throw new ArgumentNullException(nameof(pipe));
                 }
 
-                return new TransformedBeforeReturn<TNext>(_build, next => _return_pipeline(pipe(next)));
+                return new TransformedBeforeReturn<TNext>(_build, next => _pipeline(pipe(next)));
+            }
+
+            public ICommandHandlerBuilder<TNext> TransformReturn<TNext>(Func<Func<TNext, CancellationToken, Task>, Func<TCurrent, CancellationToken, Task<TResult>>> pipe)
+            {
+                if (pipe == null)
+                {
+                    throw new ArgumentNullException(nameof(pipe));
+                }
+
+                return new TransformedAtReturn<TNext>(_build, next => _pipeline(pipe(next)));
             }
 
             public ICommandHandlerBuilder<TCurrent> Return(Func<Func<TCurrent, CancellationToken, Task>, Func<TCurrent, CancellationToken, Task<TResult>>> pipe)
@@ -144,7 +174,7 @@ namespace Handelier
                     throw new ArgumentNullException(nameof(pipe));
                 }
 
-                return new TransformedAtReturn<TCurrent>(_build, next => _return_pipeline(pipe(next)));
+                return new TransformedAtReturn<TCurrent>(_build, next => _pipeline(pipe(next)));
             }
 
             public void Handle(Func<TCurrent, CancellationToken, Task<TResult>> handler)
@@ -154,7 +184,7 @@ namespace Handelier
                     throw new ArgumentNullException(nameof(handler));
                 }
 
-                _build(_return_pipeline(handler));
+                _build(_pipeline(handler));
             }
         }
 
@@ -163,10 +193,10 @@ namespace Handelier
             private readonly Action<Func<TCommand, CancellationToken, Task<TResult>>> _build;
             private readonly Func<Func<TCommand, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> _pipeline;
 
-            public AtReturn(Action<Func<TCommand, CancellationToken, Task<TResult>>> build, Func<Func<TCommand, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> return_pipeline)
+            public AtReturn(Action<Func<TCommand, CancellationToken, Task<TResult>>> build, Func<Func<TCommand, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> pipeline)
             {
                 _build = build;
-                _pipeline = return_pipeline;
+                _pipeline = pipeline;
             }
 
             public ICommandHandlerBuilder<TCommand> Pipe(Func<Func<TCommand, CancellationToken, Task>, Func<TCommand, CancellationToken, Task>> pipe)
@@ -205,10 +235,10 @@ namespace Handelier
             private readonly Action<Func<TCommand, CancellationToken, Task<TResult>>> _build;
             private readonly Func<Func<TCurrent, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> _pipeline;
 
-            public TransformedAtReturn(Action<Func<TCommand, CancellationToken, Task<TResult>>> build, Func<Func<TCurrent, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> return_pipeline)
+            public TransformedAtReturn(Action<Func<TCommand, CancellationToken, Task<TResult>>> build, Func<Func<TCurrent, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> pipeline)
             {
                 _build = build;
-                _pipeline = return_pipeline;
+                _pipeline = pipeline;
             }
 
             public ICommandHandlerBuilder<TCurrent> Pipe(Func<Func<TCurrent, CancellationToken, Task>, Func<TCurrent, CancellationToken, Task>> pipe)
@@ -249,10 +279,10 @@ namespace Handelier
 
             public AfterReturn(
                 Action<Func<TCommand, CancellationToken, Task<TResult>>> build, 
-                Func<Func<TCommand, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> return_pipeline)
+                Func<Func<TCommand, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> pipeline)
             {
                 _build = build;
-                _pipeline = return_pipeline;
+                _pipeline = pipeline;
             }
 
             public ICommandHandlerBuilder<TCommand> Pipe(Func<Func<TCommand, CancellationToken, Task>, Func<TCommand, CancellationToken, Task>> pipe)
@@ -293,10 +323,10 @@ namespace Handelier
 
             public TransformedAfterReturn(
                 Action<Func<TCommand, CancellationToken, Task<TResult>>> build, 
-                Func<Func<TCurrent, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> return_pipeline)
+                Func<Func<TCurrent, CancellationToken, Task>, Func<TCommand, CancellationToken, Task<TResult>>> pipeline)
             {
                 _build = build;
-                _pipeline = return_pipeline;
+                _pipeline = pipeline;
             }
 
             public ICommandHandlerBuilder<TCurrent> Pipe(Func<Func<TCurrent, CancellationToken, Task>, Func<TCurrent, CancellationToken, Task>> pipe)
