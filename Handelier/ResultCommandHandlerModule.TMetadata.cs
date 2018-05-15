@@ -42,12 +42,12 @@ namespace Handelier
 
         IEnumerator<ResultCommandHandler<TMetadata, TResult>> IEnumerable<ResultCommandHandler<TMetadata, TResult>>.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
         }
     }
 }
