@@ -15,7 +15,7 @@ namespace Handelier
             _handlers = new List<CommandHandler<TMetadata>>();
         }
 
-        protected ICommandHandlerBuilder<TCommand, TMetadata> For<TCommand>()
+        protected ICommandHandlerBuilder<TCommand, TMetadata> Build<TCommand>()
         {
             return new CommandHandlerBuilder<TCommand, TMetadata>(handler => 
             {

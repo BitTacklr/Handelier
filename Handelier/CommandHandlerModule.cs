@@ -15,7 +15,7 @@ namespace Handelier
             _handlers = new List<CommandHandler>();
         }
 
-        protected virtual ICommandHandlerBuilder<TCommand> For<TCommand>()
+        protected ICommandHandlerBuilder<TCommand> Build<TCommand>()
         {
             return new CommandHandlerBuilder<TCommand>(handler => 
             {
