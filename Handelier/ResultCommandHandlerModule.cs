@@ -15,7 +15,7 @@ namespace Handelier
             _handlers = new List<ResultCommandHandler<TResult>>();
         }
 
-        protected IResultCommandHandlerBuilder<TCommand, TResult> For<TCommand>()
+        protected virtual IResultCommandHandlerBuilder<TCommand, TResult> For<TCommand>()
         {
             return new ResultCommandHandlerBuilder<TCommand, TResult>(handler => 
             {

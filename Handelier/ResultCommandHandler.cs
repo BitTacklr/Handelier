@@ -14,5 +14,15 @@ namespace Handelier
 
         public Type Command { get; }
         public Func<object, CancellationToken, Task<TResult>> Handler { get; }
+
+        public ResultCommandHandler<TResult> Pipe(Func<Func<object, CancellationToken, Task<TResult>>, Func<object, CancellationToken, Task<TResult>>> pipe)
+        {
+            if (pipe == null)
+            {
+                throw new ArgumentNullException(nameof(pipe));
+            }
+
+            return new ResultCommandHandler<TResult>(Command, pipe(Handler));
+        }
     }
 }
